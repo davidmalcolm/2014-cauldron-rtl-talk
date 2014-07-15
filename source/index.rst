@@ -457,13 +457,23 @@ of ``DEF_RTL_EXPR``
 Kind of silly with e.g. ``RTX_BIN_ARITH``?
 
 
-Kind of silly with e.g. RTX_BIN_ARITH?
+Summary
+=======
+
+* I think a ``rtx_insn`` subclass of ``rtx_def`` is a "sweet spot" of
+
+  * big gain in type-safety, readability
+
+  * not too big an unheaval
+
+* I want to get this into trunk for stage 1 of 4.10/5.0 after 4.9.1
+  is released.
 
 
 Questions & Discusssion
 =======================
 
-
+Thanks for listening!
 
 .. Notes:
 
