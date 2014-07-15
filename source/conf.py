@@ -248,7 +248,7 @@ extensions += [
     'hieroglyph',
 ]
 
-slide_theme = 'slides'
+slide_theme = 'single-level'
 slide_levels = 3
 
 # Place custom static assets in the _static directory and uncomment
