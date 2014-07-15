@@ -1,11 +1,12 @@
+===========================
 A proposal for typesafe RTL
----------------------------
+===========================
+
+GNU Tools Cauldron 2014
+
+David Malcolm <dmalcolm@redhat.com>
 
 .. Typesafe RTL talk Sunday 2014-07-20 12.45->1.30
-
-.. Title: A proposal for typesafe RTL
-
-.. Author: David Malcolm <dmalcolm@redhat.com>
 
 .. Abstract: The backend code's ENABLE_RTL_CHECKING ensures that only valid
    combinations of RTL are constructed, but this option is painfully slow to
@@ -28,14 +29,16 @@ Introduction
 
   * Readability
 
-  * Type-checking
+  * Taming the array of unions inside ``rtx_def``:
+
+    * Type-checking vs ``ENABLE_RTL_CHECKING``
 
 Patches can be seen at:
   http://dmalcolm.fedorapeople.org/gcc/patch-backups/rtx-classes/
 
 
-Instructions vs Expressions
-===========================
+Instructions vs Expressions vs Nodes
+====================================
 
 The backend code is full of variables of type ``rtx``.
 
@@ -108,12 +111,18 @@ Goals:
 
   (A) Reviewable: series of *small* logically-divided patches
 
-  (B) Incremental: Able to compile and run without regressions at each
+  (B) Incremental: Able to bootstrap and run without regressions at each
       patch, on every configuration
 
-.. I managed (A), kind-of (though I didn't write ChangeLogs)
+.. rst-class:: build
 
-.. I didn't manage (B); only builds on 70 configrations out of ~200
+  * I managed (A), kind-of (though I didn't write ChangeLogs)
+
+  * I didn't manage (B):
+
+    * built and regrtested OK on x86_64
+
+    * ...but only builds on 70 configurations out of ~200
 
 
 Dealing with interdependencies
@@ -316,8 +325,8 @@ Where do we draw the line?
 
 Other classes:
 ==============
-  * INSN_LIST
   * EXPR_LIST
+  * INSN_LIST
   * SEQUENCE
   * SET (and single_set)??
   * PARALLEL?
@@ -474,6 +483,10 @@ Questions & Discusssion
 =======================
 
 Thanks for listening!
+
+
+These slides built using http://hieroglyph.io
+
 
 .. Notes:
 
