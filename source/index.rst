@@ -478,6 +478,9 @@ Summary
 * I want to get this into trunk for stage 1 of 4.10/5.0 after 4.9.1
   is released.
 
+* I'd like to also add classes for ``EXPR_LIST``, ``INSN_LIST``,
+  ``SEQUENCE``.
+
 
 Questions & Discusssion
 =======================
@@ -485,7 +488,7 @@ Questions & Discusssion
 Thanks for listening!
 
 
-These slides built using http://hieroglyph.io
+.. These slides built using http://hieroglyph.io
 
 
 .. Notes:
