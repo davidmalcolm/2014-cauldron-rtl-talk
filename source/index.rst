@@ -135,6 +135,10 @@ Some of the places that I have using `rtx_insn *`
   * e.g. within register allocators, schedulers
 * "insn" and "curr_insn" within .md files (peephole, attributes,
   define_bypass guards)
+
+.. nextslide::
+   :increment:
+
 * `insn_t` in `sel-sched-ir.h`
 * Target hooks: updated params of 25 of them
 * Debug hooks: "label" and "var_location"
@@ -144,8 +148,8 @@ Some of the places that I have using `rtx_insn *`
 * `BB_NOTE_LIST`
 * etc
 
-jump tables (1)
-===============
+jump tables
+===========
 
 The current prototype for `tablejump_p`:
 
@@ -162,8 +166,9 @@ I'd much rather this was written:
    tablejump_p (const_rtx insn, rtx *labelp, rtx *tablep);
 
 
-jump tables (2)
-===============
+.. nextslide::
+   :increment:
+
 The current prototype (with param names added):
 
 .. code-block:: c++
@@ -180,9 +185,9 @@ Using subclasses:
                 rtx_code_label **labelp,
                 rtx_jump_table_data **tablep);
 
+.. nextslide::
+   :increment:
 
-jump tables (3)
-===============
 Code that looks like this (from cfgbuild.c):
 
 .. code-block:: c++
@@ -203,10 +208,11 @@ Code that looks like this (from cfgbuild.c):
                             XEXP (RTVEC_ELT (vec, j), 0), 0);
 
 
-jump tables (4)
-===============
-can be simplified by adding a `get_labels` method to the
-JUMP_TABLE_DATA subclass:
+.. nextslide::
+   :increment:
+
+can be simplified by adding a ``get_labels`` method to the
+``JUMP_TABLE_DATA`` subclass:
 
 .. code-block:: c++
 
@@ -220,10 +226,11 @@ JUMP_TABLE_DATA subclass:
                            XEXP (RTVEC_ELT (vec, j), 0), 0);
 
 
-jump tables (5)
-===============
-and further simplified by making it a vec of LABEL_REF, assuming that we
-can have a rtx_label_ref::label method for getting the CODE_LABEL:
+.. nextslide::
+   :increment:
+
+and further simplified by making it a vec of ``LABEL_REF``, assuming that we
+can have a ``rtx_label_ref::label`` method for getting the ``CODE_LABEL``:
 
 .. code-block:: c++
 
@@ -279,9 +286,13 @@ e.g. something like this as the base class:
     /* or we could convert them to functions returning
        references, I guess */
 
-Tricky, what about:
-  * `PATTERN(INSN)`
-  * `BLOCK_FOR_INSN(INSN)`
+.. nextslide::
+   :increment:
+
+Tricky - what about:
+  * params of every ``PREV_INSN``, ``NEXT_INSN``, ``INSN_UID``
+  * ``PATTERN(INSN)``
+  * ``BLOCK_FOR_INSN(INSN)``
   * etc
 
 
@@ -313,8 +324,8 @@ Other classes:
 
 "Phase 5" of my patch kit
 
-EXPR_LIST (1)
-=============
+EXPR_LIST
+=========
 
 From reload1.c: set_initial_label_offsets:
 
@@ -328,8 +339,8 @@ From reload1.c: set_initial_label_offsets:
     if (XEXP (x, 0))
       set_label_offsets (XEXP (x, 0), NULL_RTX, 1);
 
-EXPR_LIST (2)
-=============
+.. nextslide::
+   :increment:
 
 Using subclasses:
 
@@ -376,8 +387,8 @@ Can be rewritten as:
         INSN_FROM_TARGET_P (seq->element (i))
           = ! INSN_FROM_TARGET_P (seq->element (i));
 
-Difficulties (1)
-================
+Difficulties
+============
 
 Using a single "tmp" local for multiple things:
 
@@ -402,8 +413,9 @@ Or reusing a local for both a pattern and an insn e.g.:
 
 .. from cse.c:delete_trivially_dead_insns
 
-Difficulties (2)
-================
+.. nextslide::
+   :increment:
+
 We can fix the above by splitting local "bind" into:
 * an `rtx` for the `VAR_LOCATION` and
 * an `rtx_insn *` for the `DEBUG_INSN`:
@@ -420,8 +432,8 @@ We can fix the above by splitting local "bind" into:
   df_insn_rescan (bind_insn);
 
 
-Taking it further? (1)
-======================
+Taking it further?
+==================
 Adding classes per DEF_RTL_EXPR?
 
 * Converting operands to actual fields, with types
@@ -432,9 +444,8 @@ with no compile-time cost.
 
 But very invasive.
 
-
-Taking it even further? (2)
-===========================
+.. nextslide::
+   :increment:
 
 e.g. introducing named accessors as well as types for operands
 of DEF_RTL_EXPR
