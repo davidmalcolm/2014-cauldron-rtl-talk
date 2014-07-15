@@ -54,7 +54,9 @@ I want to use types to identify instructions.
 Proposed class hierarchy
 ========================
 
-Subclasses of rtx_def::
+Subclasses of rtx_def:
+
+.. code-block:: c++
 
   class rtx_def;
     class rtx_insn; /* (INSN_P (X) || NOTE_P (X)
@@ -74,7 +76,9 @@ Subclasses of rtx_def::
 How many places?
 ================
 Number of "grep" hits in my current working copy
-(including "config" subdirs)::
+(including "config" subdirs):
+
+.. code-block:: c++
 
   class rtx_def;                   /* 25731 for "rtx" -w */
     class rtx_insn;                /* 3606 */
@@ -143,12 +147,16 @@ Some of the places that I have using `rtx_insn *`
 jump tables (1)
 ===============
 
-The current prototype for `tablejump_p`::
+The current prototype for `tablejump_p`:
+
+.. code-block:: c++
 
    extern bool tablejump_p (const_rtx, rtx *, rtx *);
 
 Aside: can we please add names to parameters in header files?
-I'd much rather this was written::
+I'd much rather this was written:
+
+.. code-block:: c++
 
    extern bool
    tablejump_p (const_rtx insn, rtx *labelp, rtx *tablep);
@@ -156,12 +164,16 @@ I'd much rather this was written::
 
 jump tables (2)
 ===============
-The current prototype (with param names added)::
+The current prototype (with param names added):
+
+.. code-block:: c++
 
    extern bool
    tablejump_p (const_rtx insn, rtx *labelp, rtx *tablep);
 
-Using subclasses::
+Using subclasses:
+
+.. code-block:: c++
 
    extern bool
    tablejump_p (const rtx_insn *insn,
@@ -171,7 +183,9 @@ Using subclasses::
 
 jump tables (3)
 ===============
-Code that looks like this::
+Code that looks like this (from cfgbuild.c):
+
+.. code-block:: c++
 
      else if (tablejump_p (insn, NULL, &table))
        {
@@ -188,13 +202,13 @@ Code that looks like this::
            make_label_edge (edge_cache, bb,
                             XEXP (RTVEC_ELT (vec, j), 0), 0);
 
-.. (from cfgbuild.c)
-
 
 jump tables (4)
 ===============
 can be simplified by adding a `get_labels` method to the
-JUMP_TABLE_DATA subclass::
+JUMP_TABLE_DATA subclass:
+
+.. code-block:: c++
 
     else if (tablejump_p (insn, NULL, &table))
       {
@@ -209,7 +223,9 @@ JUMP_TABLE_DATA subclass::
 jump tables (5)
 ===============
 and further simplified by making it a vec of LABEL_REF, assuming that we
-can have a rtx_label_ref::label method for getting the CODE_LABEL::
+can have a rtx_label_ref::label method for getting the CODE_LABEL:
+
+.. code-block:: c++
 
     else if (tablejump_p (insn, NULL, &table))
       {
@@ -223,7 +239,9 @@ can have a rtx_label_ref::label method for getting the CODE_LABEL::
 
 Status of insn separation
 =========================
-Currently at 209 patches::
+Currently at 209 patches:
+
+.. code-block:: c++
 
   class rtx_def;                   /* 25731 for "rtx" -w */
     class rtx_insn;                /* 3606 */
@@ -243,7 +261,9 @@ Full separation?
 Is it worthwhile/desirable to pursue a full separation of instructions
 from rtx nodes?
 
-e.g. something like this as the base class::
+e.g. something like this as the base class:
+
+.. code-block:: c++
 
   class rtx_insn /* we can bikeshed over the name */
   {
@@ -268,7 +288,9 @@ Tricky, what about:
 NULL_RTX
 ========
 
-We have::
+We have:
+
+.. code-block:: c++
 
   #define NULL_RTX (rtx) 0
 
@@ -294,7 +316,9 @@ Other classes:
 EXPR_LIST (1)
 =============
 
-From reload1.c: set_initial_label_offsets::
+From reload1.c: set_initial_label_offsets:
+
+.. code-block:: c++
 
   for (x = forced_labels; x; x = XEXP (x, 1))
     if (XEXP (x, 0))
@@ -307,7 +331,9 @@ From reload1.c: set_initial_label_offsets::
 EXPR_LIST (2)
 =============
 
-Using subclasses::
+Using subclasses:
+
+.. code-block:: c++
 
   for (rtx_expr_list *x = forced_labels; x; x = x->next ())
     if (x->element ())
@@ -333,13 +359,17 @@ e.g. in sched-int.h:struct deps_desc::
 SEQUENCE
 ========
 
-From resource.c:find_dead_or_set_registers::
+From resource.c:find_dead_or_set_registers:
+
+.. code-block:: c++
 
       for (i = 1; i < XVECLEN (PATTERN (insn), 0); i++)
         INSN_FROM_TARGET_P (XVECEXP (PATTERN (insn), 0, i))
           = ! INSN_FROM_TARGET_P (XVECEXP (PATTERN (insn), 0, i));
 
-Can be rewritten as::
+Can be rewritten as:
+
+.. code-block:: c++
 
       rtx_sequence *seq = as_a <rtx_sequence *> (PATTERN (insn));
       for (i = 1; i < seq->len (); i++)
@@ -349,11 +379,15 @@ Can be rewritten as::
 Difficulties (1)
 ================
 
-Using a single "tmp" local for multiple things::
+Using a single "tmp" local for multiple things:
+
+.. code-block:: c++
 
   rtx tmp;
 
-Or reusing a local for both a pattern and an insn e.g.::
+Or reusing a local for both a pattern and an insn e.g.:
+
+.. code-block:: c++
 
   /* Emit a debug bind insn before the insn in which
     reg dies.  */
@@ -372,7 +406,9 @@ Difficulties (2)
 ================
 We can fix the above by splitting local "bind" into:
 * an `rtx` for the `VAR_LOCATION` and
-* an `rtx_insn *` for the `DEBUG_INSN`::
+* an `rtx_insn *` for the `DEBUG_INSN`:
+
+.. code-block:: c++
 
   bind_var_loc = gen_rtx_VAR_LOCATION (GET_MODE (SET_DEST (set)),
                                        DEBUG_EXPR_TREE_DECL (dval),
