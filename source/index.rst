@@ -37,7 +37,7 @@ Patches can be seen at:
 Instructions vs Expressions
 ===========================
 
-The backend code is full of variables of type `rtx`.
+The backend code is full of variables of type ``rtx``.
 
 Sometimes these are arbitrary expressions.
 
@@ -54,7 +54,7 @@ I want to use types to identify instructions.
 Proposed class hierarchy
 ========================
 
-Subclasses of rtx_def:
+Subclasses of ``rtx_def``:
 
 .. code-block:: c++
 
@@ -126,32 +126,34 @@ Current approach: 4 phases:
   4) Remove scaffolding (currently 42 patches)
 
 
-Some of the places that I have using `rtx_insn *`
-=================================================
-* Basic blocks: `BB_HEAD`, `BB_END`, `BB_HEADER`, `BB_FOOTER`.
-* Result of `NEXT_INSN` and `PREV_INSN`.
-* Results of `next_insn`, `prev_nonnote_insn` et al
+Some of the places that I have using ``rtx_insn *``
+===================================================
+* Basic blocks: ``BB_HEAD``, ``BB_END``, ``BB_HEADER``, ``BB_FOOTER``.
+* Result of ``NEXT_INSN`` and ``PREV_INSN``.
+* Results of ``next_insn``, ``prev_nonnote_insn`` et al
 * Hundreds of function params, struct fields, etc.
+
   * e.g. within register allocators, schedulers
+
 * "insn" and "curr_insn" within .md files (peephole, attributes,
   define_bypass guards)
 
 .. nextslide::
    :increment:
 
-* `insn_t` in `sel-sched-ir.h`
+* ``insn_t`` in `sel-sched-ir.h`
 * Target hooks: updated params of 25 of them
 * Debug hooks: "label" and "var_location"
-* Result of `DF_REF_INSN`
-* `DEP_PRO` and `DEP_CON`
-* `VINSN_INSN_RTX`
-* `BB_NOTE_LIST`
+* Result of ``DF_REF_INSN``
+* ``DEP_PRO`` and ``DEP_CON``
+* ``VINSN_INSN_RTX``
+* ``BB_NOTE_LIST``
 * etc
 
 jump tables
 ===========
 
-The current prototype for `tablejump_p`:
+The current prototype for ``tablejump_p``:
 
 .. code-block:: c++
 
@@ -305,7 +307,7 @@ We have:
 
   #define NULL_RTX (rtx) 0
 
-Do we want a `NULL_INSN`?
+Do we want a ``NULL_INSN``?
 
 Where do we draw the line?
 
@@ -357,7 +359,7 @@ Using subclasses:
 INSN_LIST
 =========
 
-e.g. in sched-int.h:struct deps_desc::
+e.g. in sched-int.h struct deps_desc::
 
      /* A list of the last function calls we have seen.  We use a list to
         represent last function calls from multiple predecessor blocks.
@@ -417,8 +419,10 @@ Or reusing a local for both a pattern and an insn e.g.:
    :increment:
 
 We can fix the above by splitting local "bind" into:
-* an `rtx` for the `VAR_LOCATION` and
-* an `rtx_insn *` for the `DEBUG_INSN`:
+
+  * an ``rtx`` for the ``VAR_LOCATION`` and
+
+  * an ``rtx_insn *`` for the ``DEBUG_INSN``
 
 .. code-block:: c++
 
@@ -434,12 +438,12 @@ We can fix the above by splitting local "bind" into:
 
 Taking it further?
 ==================
-Adding classes per DEF_RTL_EXPR?
+Adding classes per ``DEF_RTL_EXPR``?
 
 * Converting operands to actual fields, with types
-* Converting e.g. `XINT(RTX, N)` to lookup of `m_fieldN`
+* Converting e.g. ``XINT(RTX, N)`` to lookup of ``m_fieldN``
 
-This would give us the equivalent of today's `ENABLE_RTL_CHECKING`
+This would give us the equivalent of today's ``ENABLE_RTL_CHECKING``
 with no compile-time cost.
 
 But very invasive.
@@ -448,7 +452,10 @@ But very invasive.
    :increment:
 
 e.g. introducing named accessors as well as types for operands
-of DEF_RTL_EXPR
+of ``DEF_RTL_EXPR``
+
+Kind of silly with e.g. ``RTX_BIN_ARITH``?
+
 
 Kind of silly with e.g. RTX_BIN_ARITH?
 
